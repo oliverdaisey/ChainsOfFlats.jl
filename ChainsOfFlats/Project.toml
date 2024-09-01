@@ -1,0 +1,7 @@
+name = "ChainsOfFlats"
+uuid = "fb3235ca-481b-4466-8e88-5274ae3be5e8"
+authors = ["Oliver Daisey <oliverjdaisey@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+Oscar = "f1435218-dba5-11e9-1e4d-f1a5fab5fc13"
