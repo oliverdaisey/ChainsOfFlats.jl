@@ -1,14 +1,26 @@
 module ChainsOfFlats
 
 using Oscar
+export trivalent_tropical_linear_space
+
 numBitsConstant = 6 # number of bits to choose for generating random rationals
+maxAttemptsConstant = 100 # maximum number of attempts to create a tropical linear space
+verbose = true # print messages
 
 """
-    trivalent_tropical_linear_space(n::Int, k::Int, bergmanFan::Bool = false)
+    trivalent_tropical_linear_space(n::Int, k::Int, bergmanFan::Bool = false, numBits::Int = numBitsConstant, maxAttempts::Int = maxAttemptsConstant)
 
-Given a number of variables `n` and number of linear forms `k`, returns a tropical linear space with exactly three maximal cones.
+Given positive integers `n` and `k`, this function attempts to create a trivalent tropical linear space in `n` variables with `k` linear forms.
+
+The optional argument `bergmanFan` is a boolean that determines whether to perturb coefficients or not. The optional argument `numBits` is the number of bits to choose for generating random rationals. The optional argument `maxAttempts` is the maximum number of attempts to create a tropical linear space.
 """
-function trivalent_tropical_linear_space(n::Int, k::Int, bergmanFan::Bool = false, numBits::Int = numBitsConstant)
+function trivalent_tropical_linear_space(n::Int, k::Int, bergmanFan::Bool = false, numBits::Int = numBitsConstant, maxAttempts::Int = maxAttemptsConstant)
+
+    # check if we have enough attempts left
+    if (maxAttempts == 0)
+        println("Ran out of attempts to create trivalent tropical linear space! Aborting.")
+        return nothing
+    end
 
     # the strategy is to create a linear ideal from binomials and one trinomial
     @assert (n > 0) & (k > 0) "The number of variables and linear forms must be positive."
@@ -49,12 +61,15 @@ function trivalent_tropical_linear_space(n::Int, k::Int, bergmanFan::Bool = fals
         I = ideal(linearForms)
     end
 
+    if verbose println("Attempting to construct the tropical linear space with exactly three maximal cones.") end
     TropL = tropical_linear_space(I, nu)
     if (n_maximal_polyhedra(TropL) == 3)
         return TropL
     end
-    # create the tropical linear space
-    return trivalent_tropical_linear_space(n, k, bergmanFan, numBits)
+
+    if verbose println("Failed to create a tropical linear space with exactly three maximal cones. ($(maxAttempts-1) attempts left)") end
+
+    return trivalent_tropical_linear_space(n, k, bergmanFan, numBits, maxAttempts-1)
 
 end
 
